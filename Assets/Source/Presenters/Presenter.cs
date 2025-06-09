@@ -1,28 +1,58 @@
-public class Presenter : ISubscribable
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using Zenject;
+
+public class Presenter : IActivatable, IUpdatable
 {
     private readonly Model _model;
     private readonly View _view;
-    private readonly ISubscribable _subscribable = null;
+    private readonly IActivatable _activatable = null;
+    private readonly IUpdatable _updatable = null;
+    private readonly List<IDisposable> _subscriptions = new List<IDisposable>();
 
     public Presenter(Model model, View view)
     {
         _model = model;
         _view = view;
 
-        if (model is ISubscribable subscribable)
-            _subscribable = subscribable;
+        if (model is IActivatable subscribable)
+            _activatable = subscribable;
+
+        if (model is IUpdatable updatable)
+            _updatable = updatable;
     }
 
     protected Model Model => _model;
     protected View View => _view;
+    protected List<IDisposable> Subscriptions => _subscriptions;
 
-    public virtual void Subscribe()
+    public void AddSubscription(IDisposable subscription)
     {
-        _subscribable?.Subscribe();
+        _subscriptions.Add(subscription);
     }
 
-    public virtual void Unsubscribe()
+    public void Enable()
     {
-        _subscribable?.Unsubscribe();
+        _activatable?.Enable();
+
+        if (this is ISubscribable subscribable)
+            subscribable.Subscribe();
+    }
+
+    public void Disable()
+    {
+        _activatable?.Disable();
+
+        foreach (var subscription in _subscriptions)
+            subscription.Dispose();
+    }
+
+    public void Update(float deltaTime)
+    {
+        _updatable?.Update(Time.deltaTime);
+
+        if (this is ITickable tickable)
+            tickable.Tick();
     }
 }

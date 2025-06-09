@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f257aaa0bb23c794c86deb06717b9ee5, type: 3}
   m_Name: Character
   m_EditorClassIdentifier: 
-  <Speed>k__BackingField: 3
+  <Speed>k__BackingField: 2
   <RotationSensitivity>k__BackingField: 265
+  <DodgeRange>k__BackingField: 5
+  <DodgeDuration>k__BackingField: 1.033

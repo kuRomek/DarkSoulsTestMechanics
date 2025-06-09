@@ -8,11 +8,22 @@ public class CameraMovement : MonoBehaviour
 
     [Inject] private PlayerInputController _input;
 
+    private static CameraMovement _instance = null;
+
     private Vector3 _offset;
     private float _verticalRotation;
 
+    public static CameraMovement Instance => _instance;
     public Vector3 Forward { get; private set; }
     public Quaternion HorizontalRotation { get; private set; }
+
+    private void Awake()
+    {
+        if (_instance == null)
+            _instance = this;
+        else
+            Destroy(gameObject);
+    }
 
     private void Start()
     {
@@ -20,13 +31,13 @@ public class CameraMovement : MonoBehaviour
         _verticalRotation = transform.localEulerAngles.x;
     }
 
-    private void Update()
+    private void LateUpdate()
     {
-        RotateVertical();
-        RotateHorizontal();
+        Rotate();
+        Move();
     }
 
-    private void RotateVertical()
+    private void Rotate()
     {
         Vector2 velocity = _input.LookingDirection * Configs.Character.RotationSensitivity * Time.deltaTime;
 
@@ -42,12 +53,13 @@ public class CameraMovement : MonoBehaviour
             transform.eulerAngles.x,
             transform.eulerAngles.y + velocity.x,
             transform.eulerAngles.z);
-    }
 
-    private void RotateHorizontal()
-    {
-        transform.position = Vector3.Lerp(transform.position, _target.position + _offset, 1 / (_smoothness + 1));
         Forward = new Vector3(transform.forward.x, 0f, transform.forward.z).normalized;
         HorizontalRotation = Quaternion.LookRotation(Forward);
+    }
+
+    private void Move()
+    {
+        transform.position = Vector3.Lerp(transform.position, _target.position + _offset, 1 / (_smoothness + 1));
     }
 }
