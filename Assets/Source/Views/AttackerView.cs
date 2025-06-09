@@ -3,8 +3,10 @@ using UnityEngine;
 
 public class AttackerView : CharacterView
 {
+    private readonly Subject<Unit> _attackStarted = new Subject<Unit>();
     private readonly Subject<Unit> _attackStopped = new Subject<Unit>();
-
+    
+    public Observable<Unit> AttackStarted => _attackStarted;
     public Observable<Unit> AttackStopped => _attackStopped;
 
     public new AttackerAnimationEventHandler AnimationEventHandler =>
@@ -14,12 +16,18 @@ public class AttackerView : CharacterView
     {
         base.Subscribe();
 
+        AddSubscription(AnimationEventHandler.StartedAttacking.Subscribe(_ => OnAttackStarted()));
         AddSubscription(AnimationEventHandler.StoppedAttacking.Subscribe(_ => OnAttackStopped()));
     }
 
-    public void OnAttacking()
+    public void QueueAttackingAnimation()
     {
         Animator.SetTrigger(CharacterAnimatorData.Params.Attack);
+    }
+
+    public void OnAttackStarted()
+    {
+        _attackStarted.OnNext(Unit.Default);
     }
 
     public void OnAttackStopped()

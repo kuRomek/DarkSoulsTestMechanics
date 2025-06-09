@@ -6,13 +6,14 @@ public class Attacker : Character
 
     public Observable<Unit> Attacking => _attacked;
 
-    public void Attack()
+    public void QueueAttack()
     {
-        if (IsInputEnabled)
-        {
-            ToggleInput(false);
-            _attacked.OnNext(Unit.Default);
-        }
+        _attacked.OnNext(Unit.Default);
+    }
+
+    public void OnAttackStarted()
+    {
+        ToggleInput(false);
     }
 
     public void OnAttackStopped()

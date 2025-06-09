@@ -10,11 +10,10 @@ public class CharacterPresenter : Presenter, ISubscribable
 
     public virtual void Subscribe()
     {
-        AddSubscription(Model.Position.Subscribe(View.OnMoved));
-        AddSubscription(Model.Rotation.Subscribe(View.OnRotated));
         AddSubscription(View.PositionChanged.Subscribe(position => Model.Position.Value = position));
         AddSubscription(View.RotationChanged.Subscribe(rotation => Model.Rotation.Value = rotation));
-        AddSubscription(Model.Dodged.Subscribe(View.OnDodging));
-        AddSubscription(View.StoppedDodging.Subscribe(_ => Model.OnStoppedDodging()));
+        AddSubscription(Model.Dodged.Subscribe(_ => View.QueueDodgeAnimation()));
+        AddSubscription(View.StartedDodging.Subscribe(_ => Model.OnDodgeStartd()));
+        AddSubscription(View.StoppedDodging.Subscribe(_ => Model.OnDodgeStopped()));
     }
 }

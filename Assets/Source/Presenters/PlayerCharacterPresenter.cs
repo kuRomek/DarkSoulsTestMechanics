@@ -18,20 +18,18 @@ public class PlayerCharacterPresenter : AttackerPresenter, ITickable
     {
         base.Subscribe();
 
-        AddSubscription(_input.ClickedDodgingButton.Subscribe(_ => 
-            Model.Dodge(_input.MovingDirection, CameraMovement.Instance.HorizontalRotation)));
-
-        AddSubscription(_input.ClickedAttackButton.Subscribe(_ =>
-            Model.Attack()));
+        AddSubscription(_input.ClickedDodgingButton.Subscribe(_ => Model.QueueDodge()));
+        AddSubscription(_input.ClickedAttackButton.Subscribe(_ => Model.QueueAttack()));
     }
 
     public void Tick()
     {
-        View.OnMoved(Model.Position.Value);
-
         Model.Move(
             _input.MovingDirection,
             CameraMovement.Instance.HorizontalRotation,
             Configs.Character.Speed * Time.deltaTime);
+
+        View.OnMoved(Model.Position.Value);
+        View.OnRotated(Model.Rotation.Value);
     }
 }
