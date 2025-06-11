@@ -4,7 +4,7 @@ public class Attacker : Character
 {
     private readonly Subject<Unit> _attacked = new Subject<Unit>();
 
-    public Observable<Unit> Attacking => _attacked;
+    public Observable<Unit> AttackQueued => _attacked;
 
     public void QueueAttack()
     {

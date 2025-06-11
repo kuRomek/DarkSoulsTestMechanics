@@ -5,8 +5,11 @@ using UnityEngine;
 public class CharacterView : View, ISubscribable
 {
     [SerializeField] private Animator _animator;
+    [SerializeField] private CharacterController _characterController;
     [SerializeField] private CharacterAnimationEventHandler _animationEventHandler;
     [SerializeField, Range(0f, 100f)] private float _rotationSmoothness;
+
+    private Dodge _currentDodge = null;
 
     private readonly Subject<Unit> _startedDodging = new Subject<Unit>();
     private readonly Subject<Unit> _stoppedDodging = new Subject<Unit>();
@@ -14,26 +17,28 @@ public class CharacterView : View, ISubscribable
     public Observable<Unit> StartedDodging => _startedDodging;
     public Observable<Unit> StoppedDodging => _stoppedDodging;
 
-    public Animator Animator => _animator;
-    public CharacterAnimationEventHandler AnimationEventHandler => _animationEventHandler;
     public virtual float MovingMagnitude => 1f;
-    public virtual Vector3 DodgingDirection => transform.forward;
+    public virtual Vector3 LookingDirection => transform.forward;
+    protected float RotationSmoothness => _rotationSmoothness;
+    protected Animator Animator => _animator;
+    protected CharacterAnimationEventHandler AnimationEventHandler => _animationEventHandler;
+
+    private void FixedUpdate()
+    {
+        _characterController.Move(Physics.gravity * Time.fixedDeltaTime);
+        OnPositionChanged();
+    }
 
     public virtual void Subscribe()
     {
         AddSubscription(_animationEventHandler.StartedDodging.Subscribe(_ => Dodge()));
-        AddSubscription(_animationEventHandler.StoppedDodging.Subscribe(_ => OnStoppedDodging()));
     }
 
-    public void OnMoved(Vector3 position)
+    public void Move(Vector3 direction)
     {
-        transform.position = position;
+        _characterController.Move(direction * Time.deltaTime);
         _animator.SetFloat(CharacterAnimatorData.Params.MovingMagnitude, MovingMagnitude);
-    }
-
-    public void OnRotated(Quaternion rotation)
-    {
-        transform.rotation = Quaternion.Lerp(transform.rotation, rotation, 1f / (1f + _rotationSmoothness));
+        OnPositionChanged();
     }
 
     public void QueueDodgeAnimation()
@@ -43,21 +48,31 @@ public class CharacterView : View, ISubscribable
 
     public void Dodge()
     {
+        _currentDodge?.Interrupt();
+
         _startedDodging.OnNext(Unit.Default);
 
-        Vector3 dodgingDirection = DodgingDirection;
+        Animator.SetFloat(
+            CharacterAnimatorData.Params.DodgeSpeed,
+            Configs.Character.DodgeAnimationDuration / Configs.Character.DodgeDuration);
 
-        transform.DOMove(dodgingDirection * Configs.Character.DodgeRange, Configs.Character.DodgeDuration).
-            SetRelative().
-            OnUpdate(() => ChangePosition(transform.position));
+        Vector3 dodgeDirection = LookingDirection;
+        dodgeDirection = dodgeDirection == Vector3.zero ? transform.forward : dodgeDirection.normalized;
+
+        _currentDodge = new Dodge(dodgeDirection, _characterController);
+        _currentDodge.PositionChanged += OnPositionChanged;
+        _currentDodge.DodgeFinished += OnStoppedDodging;
 
         transform.DORotateQuaternion(
-            Quaternion.LookRotation(dodgingDirection),
+            Quaternion.LookRotation(dodgeDirection),
             0.3f);
     }
 
     public void OnStoppedDodging()
     {
+        _currentDodge.PositionChanged -= OnPositionChanged;
+        _currentDodge.DodgeFinished -= OnStoppedDodging;
+        _currentDodge = null;
         _stoppedDodging.OnNext(Unit.Default);
     }
 }

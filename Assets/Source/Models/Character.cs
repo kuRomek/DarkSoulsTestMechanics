@@ -1,22 +1,16 @@
-using UnityEngine;
 using R3;
 
 public class Character : Model
 {
     private readonly Subject<Unit> _dodged = new Subject<Unit>();
 
-    public Observable<Unit> Dodged => _dodged;
+    public Observable<Unit> DodgeQueued => _dodged;
 
     public bool IsInputEnabled { get; private set; } = true;
 
-    public void ToggleInput(bool isInputBlocked)
+    public void ToggleInput(bool isInputEnabled)
     {
-        IsInputEnabled = isInputBlocked;
-    }
-
-    public void Move(Vector3 direction)
-    {
-        Position.Value += direction;
+        IsInputEnabled = isInputEnabled;
     }
 
     public void QueueDodge()

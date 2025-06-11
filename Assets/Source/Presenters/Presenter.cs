@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
+using R3;
 
 public class Presenter : IActivatable, IUpdatable
 {
@@ -35,6 +36,11 @@ public class Presenter : IActivatable, IUpdatable
     public void Enable()
     {
         _activatable?.Enable();
+
+        AddSubscription(View.PositionChanged.Subscribe(position => Model.Position.Value = position));
+        AddSubscription(View.RotationChanged.Subscribe(rotation => Model.Rotation.Value = rotation));
+        AddSubscription(Model.Position.Subscribe(position => View.transform.position = position));
+        AddSubscription(Model.Rotation.Subscribe(rotation => View.transform.rotation = rotation));
 
         if (this is ISubscribable subscribable)
             subscribable.Subscribe();

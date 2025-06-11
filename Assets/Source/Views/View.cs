@@ -25,16 +25,14 @@ public class View : MonoBehaviour
             subscription.Dispose();
     }
 
-    public void ChangePosition(Vector3 position)
+    public void OnPositionChanged()
     {
-        transform.position = position;
-        _positionChanged.OnNext(position);
+        _positionChanged.OnNext(transform.position);
     }
 
-    public void ChangeRotation(Quaternion rotation)
+    public void OnRotationChanged()
     {
-        transform.rotation = rotation;
-        _rotationChanged.OnNext(rotation);
+        _rotationChanged.OnNext(transform.rotation);
     }
 
     protected void AddSubscription(IDisposable disposable)

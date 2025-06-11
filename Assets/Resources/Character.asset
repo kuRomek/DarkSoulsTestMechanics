@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f257aaa0bb23c794c86deb06717b9ee5, type: 3}
   m_Name: Character
   m_EditorClassIdentifier: 
+  _dodgeAnimationClip: {fileID: 7400000, guid: acc3dd6be54115045bd093a876694203, type: 2}
   <Speed>k__BackingField: 2
   <RotationSensitivity>k__BackingField: 265
   <DodgeRange>k__BackingField: 5

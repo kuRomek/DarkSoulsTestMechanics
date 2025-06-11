@@ -9,7 +9,7 @@ public class AttackerView : CharacterView
     public Observable<Unit> AttackStarted => _attackStarted;
     public Observable<Unit> AttackStopped => _attackStopped;
 
-    public new AttackerAnimationEventHandler AnimationEventHandler =>
+    protected new AttackerAnimationEventHandler AnimationEventHandler =>
         base.AnimationEventHandler as AttackerAnimationEventHandler;
 
     public override void Subscribe()

@@ -10,12 +10,24 @@ public class CameraMovement : MonoBehaviour
 
     private static CameraMovement _instance = null;
 
+    private Vector3 _forward;
+    private Quaternion _horizontalRotation;
     private Vector3 _offset;
     private float _verticalRotation;
 
     public static CameraMovement Instance => _instance;
-    public Vector3 Forward { get; private set; }
-    public Quaternion HorizontalRotation { get; private set; }
+
+    public static Vector3 Forward
+    {
+        get => _instance == null ? default : _instance._forward;
+        private set => _instance._forward = value;
+    }
+
+    public static Quaternion HorizontalRotation
+    {
+        get => _instance == null ? default : _instance._horizontalRotation;
+        private set => _instance._horizontalRotation = value;
+    }
 
     private void Awake()
     {
@@ -54,8 +66,9 @@ public class CameraMovement : MonoBehaviour
             transform.eulerAngles.y + velocity.x,
             transform.eulerAngles.z);
 
-        Forward = new Vector3(transform.forward.x, 0f, transform.forward.z).normalized;
-        HorizontalRotation = Quaternion.LookRotation(Forward);
+        _forward = new Vector3(transform.forward.x, 0f, transform.forward.z).normalized;
+
+        _horizontalRotation = Quaternion.LookRotation(_forward);
     }
 
     private void Move()

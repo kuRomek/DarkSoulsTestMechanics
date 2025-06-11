@@ -707,6 +707,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animator: {fileID: 1140643318}
+  _characterController: {fileID: 536984440}
   _animationEventHandler: {fileID: 1140643319}
   _rotationSmoothness: 12
 --- !u!1 &716406186

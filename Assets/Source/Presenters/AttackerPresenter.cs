@@ -12,7 +12,7 @@ public class AttackerPresenter : CharacterPresenter
     {
         base.Subscribe();
 
-        AddSubscription(Model.Attacking.Subscribe(_ => View.QueueAttackingAnimation()));
+        AddSubscription(Model.AttackQueued.Subscribe(_ => View.QueueAttackingAnimation()));
         AddSubscription(View.AttackStarted.Subscribe(_ => Model.OnAttackStarted()));
         AddSubscription(View.AttackStopped.Subscribe(_ => Model.OnAttackStopped()));
     }
